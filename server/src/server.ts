@@ -3,11 +3,16 @@ import { connectToDB } from './config';
 import { errorHandler } from './middleware';
 import goalsRouter from './routes/goal-routes';
 import userRouter from './routes/user-routes';
+import cors from 'cors';
+import path from 'path';
 
 
 //Connecting to DB
 connectToDB();
 const app: Application = express();
+
+//enable cross origin policy
+app.use(cors());
 
 //This function is used to access the env variables
 const port: number = parseInt(process.env.SERVER_PORT!) || 5000;
@@ -23,6 +28,21 @@ app.use('/api/users', userRouter);
 
 //Here the express server is using the custom error handler
 app.use(errorHandler);
+
+
+//Server FrontEnd
+
+if (process.env.NODE_ENV === "production") {
+    app.use(express.static(path.join(__dirname, '../../client/dist')));
+
+    app.get('*', (req, res) => {
+        res.sendFile(path.resolve(__dirname, '../../' + 'client' + 'dist' + 'index.html'));
+    })
+} else {
+    app.get('/', (req, res) => {
+        res.send('Please Change the mode to production')
+    })
+}
 
 //This method is used to start the server
 app.listen(port, () => {

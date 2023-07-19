@@ -11,7 +11,11 @@ export const protect: RequestHandler = asyncHandler(async (req: IAuthRequest, re
             token = req.headers.authorization.split(" ")[1];
 
             const { id } = jwt.verify(token, process.env.SECRET!) as { id: string };
-            req.user = await User.findById(id).select('-password') as IUser; // Assign the user to req.user
+            const user = await User.findById(id).select('-password') as IUser; // Assign the user to req.user
+            if (!user) {
+                throw new Error();
+            }
+            req.user = user;
             next();
         }
         catch (error) {

@@ -1,0 +1,17 @@
+{
+  "name": "mern-tutorial",
+  "version": "1.0.0",
+  "author": "Niranjan A S",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev": "concurrently \"yarn workspace client dev\" \"yarn workspace server dev\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  }
+}

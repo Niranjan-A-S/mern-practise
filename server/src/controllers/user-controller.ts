@@ -37,9 +37,6 @@ export const registerUser: RequestHandler = asyncHandler(async (req, res) => {
 
     if (user) {
         res.status(201).json({
-            id: user._id,
-            name: user.name,
-            email: user.email,
             token: generateToken(user._id as string)
         });
     } else {
@@ -54,13 +51,14 @@ export const registerUser: RequestHandler = asyncHandler(async (req, res) => {
 export const loginUser: RequestHandler = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
-
+    if (!user) {
+        res.status(400);
+        throw new Error('Invalid User');
+    }
     const isPasswordCorrect = await bcrypt.compare(password, user?.password);
-    if (user && isPasswordCorrect) {
+    if (isPasswordCorrect) {
         res.status(201).json({
-            id: user._id,
             name: user.name,
-            email: user.email,
             token: generateToken(user._id as string)
         });
     } else {
@@ -73,6 +71,5 @@ export const loginUser: RequestHandler = asyncHandler(async (req, res) => {
 //? @route GET /api/users/me
 //* @access Private
 export const getMe: RequestHandler = asyncHandler(async (req: IAuthRequest, res) => {
-    const user = await User.findById(req?.user?.id).select('-password');
-    res.status(200).json({ id: user?._id, name: user?.name, email: user?.email })
+    res.status(200).json(req.user);
 });

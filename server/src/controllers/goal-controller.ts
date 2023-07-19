@@ -24,7 +24,7 @@ export const setGoals: RequestHandler = asyncHandler(async (req: IAuthRequest, r
     } else {
         const { body: { text }, user } = req;
         await Goal.create({ text, user: user?.id });
-        res.status(200).json({ message: 'Set Goal' });
+        res.status(200).json({ message: 'Goal Added Successfully' });
     }
 });
 
@@ -39,14 +39,12 @@ export const updateGoal: RequestHandler = asyncHandler(async (req: IAuthRequest,
         throw new Error('Goal not found');
     }
 
-    const user = await User.findById(req?.user?.id);
-
-    if (!user) {
+    if (!req.user) {
         res.status(401);
         throw new Error('User not found');
     }
 
-    if (goal.user.toString() !== user.id) {
+    if (goal.user.toString() !== req.user.id) {
         res.status(401);
         throw new Error('User not authorized');
     }
@@ -66,14 +64,13 @@ export const deleteGoal: RequestHandler = asyncHandler(async (req: IAuthRequest,
         throw new Error('Goal not found');
     }
 
-    const user = await User.findById(req?.user?.id);
 
-    if (!user) {
+    if (!req.user) {
         res.status(401);
         throw new Error('User not found');
     }
 
-    if (goal.user.toString() !== user.id) {
+    if (goal.user.toString() !== req.user.id) {
         res.status(401);
         throw new Error('User not authorized');
     }
